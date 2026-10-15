@@ -107,7 +107,18 @@ Fill this in as you go. Bullet points are fine — be specific, not long.
 
 Optional. Answer only the ones you got to — number them, skip the rest.
 
->
+1. Reduce the size of the proxy image
+   - Before: 452MB. After: 102MB (about 77% smaller). I measured it with `docker images | grep proxy`.
+   - I changed the base image from `ubuntu:24.04` to `nginx:alpine`, a small Linux that already has nginx and curl.
+   - I removed the `apt-get install` line, so `htop`, `vim` and `git` are gone. A proxy does not need them.
+   - I removed the `CMD` line, because the nginx image already starts nginx. The tests still pass.
+
+2. Run the proxy as a non-root user
+   - I added `USER nginx` (this user already exists in the image). `docker compose exec proxy whoami` prints `nginx`.
+   - At first it failed: `mkdir() "/var/cache/nginx/client_temp" failed (13: Permission denied)`. Those folders belong to root.
+   - Fix: `RUN chown -R nginx:nginx /var/cache/nginx /run`, placed before `USER nginx`.
+   - I also tried giving ownership only to `/var/cache/nginx`. It failed with `open() "/run/nginx.pid" failed (13: Permission denied)`, so both folders are needed.
+   - Port 80 worked for the non-root user, so I did not change the port.
 
 ---
 
