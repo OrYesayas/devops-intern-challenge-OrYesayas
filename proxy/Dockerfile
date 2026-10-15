@@ -2,10 +2,10 @@
 
 FROM ubuntu:24.04
 
-COPY nginx.conf /etc/nginx/nginx.conf
-
 RUN apt-get update && \
     apt-get install -y nginx curl htop vim git
+
+COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
 
